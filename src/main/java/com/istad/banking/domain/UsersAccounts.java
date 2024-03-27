@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,12 +17,13 @@ public class UsersAccounts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Timestamp createdAt;
-    private boolean isDeleted;
+    private LocalDateTime createdAt;
+    private Boolean isDeleted;
 
-    @OneToMany
-    private List<Account> account;
+    @ManyToOne
+    private Account account;
 
-    @OneToOne
+    @ManyToOne
     private User user;
+
 }

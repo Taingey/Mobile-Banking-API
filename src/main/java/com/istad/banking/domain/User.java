@@ -15,21 +15,28 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(length = 50)
     private String name;
 
-    @Column(length = 20)
+    @Column(length = 8)
     private String gender;
 
-    @Column(length = 15)
+    @Column(unique = true, nullable = false, length = 15)
     private String uuid;
 
     @Column(unique = true)
-    private boolean isDeleted;
+    private String onSignalId;
 
     @Column(unique = true)
-    private boolean isStudent;
+    private boolean isStudentCard;
 
-    @OneToOne
-    private UsersAccounts usersAccounts;
+    private Boolean isStudent;
+    private Boolean isDeleted;
+
+    @OneToMany(mappedBy = "user")
+    private List<UsersAccounts> usersAccounts;
+
+    @OneToMany(mappedBy = "user")
+    private List<UsersRoles> usersRoles;
+
 }

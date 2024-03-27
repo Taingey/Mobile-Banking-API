@@ -3,6 +3,9 @@ package com.istad.banking.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,17 +16,20 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false, length = 9)
     private String accountNo;
 
+    @Column(unique = true, nullable = false, length = 100)
     private String accountName;
 
-    @Column(length = 8)
-    private String password;
-
-    private String phoneNumber;
-
-    private Integer transferLimit;
+    private BigDecimal transferLimit;
 
     @ManyToOne
     private AccountType accountType;
+
+    @OneToMany(mappedBy = "account")
+    private List<UsersAccounts> usersAccounts;
+
+    @OneToMany(mappedBy = "account")
+    private List<Card> card;
 }

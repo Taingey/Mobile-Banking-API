@@ -19,20 +19,14 @@ public class AccountType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    private boolean isDeleted;
-
-    private Timestamp createdAt;
-
-    private BigInteger createdBy;
-
-    private Timestamp updatedAt;
-
-    private BigInteger updateBy;
-
+    @Column(columnDefinition = "TEXT")
     private String description;
 
+    private Boolean isDeleted;
+
     @OneToMany(mappedBy = "accountType")
-    private List<Account> account;
+    private List<Account> accounts;
 }
