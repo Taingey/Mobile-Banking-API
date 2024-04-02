@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -20,17 +19,23 @@ public class Transactions {
     private Long id;
 
     @ManyToOne
-    private Account sender;
+    private Account owner;
 
     @ManyToOne
-    private Account receiver;
+    private Account transferReceiver;
+
+    private String paymentReceiver;
 
     private BigDecimal amount;
-    private String remark;
-    private Boolean isPayment;
-    private LocalDateTime transactionAt;
-    private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "transactions")
-    private List<Notifications> notifications;
+    @Column(columnDefinition = "TEXT")
+    private String remark;
+
+    @Column(nullable = false, length = 30)
+    private String transactionType;
+
+    private Boolean status;
+
+    private LocalDateTime transactionAt;
+
 }

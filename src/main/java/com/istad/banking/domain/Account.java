@@ -22,7 +22,14 @@ public class Account {
     @Column(unique = true, nullable = false, length = 100)
     private String accountName;
 
+    @Column(nullable = false)
     private BigDecimal transferLimit;
+
+    @Column(length = 100)
+    private String alias;
+
+    @Column(nullable = false)
+    private BigDecimal balance;
 
     @ManyToOne
     private AccountType accountType;
@@ -30,6 +37,8 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<UsersAccounts> usersAccounts;
 
-    @OneToMany(mappedBy = "account")
-    private List<Card> card;
+    @OneToOne
+    private Card card;
+
+    private Boolean isHidden;
 }

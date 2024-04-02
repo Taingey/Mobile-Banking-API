@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,13 +16,16 @@ public class UsersAccounts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime createdAt;
-    private Boolean isDeleted;
+
+    @ManyToOne
+    private User user;
 
     @ManyToOne
     private Account account;
 
-    @ManyToOne
-    private User user;
+    private Boolean isDeleted;
+    private Boolean isBlocked;
+
+    private LocalDateTime createdAt;
 
 }
