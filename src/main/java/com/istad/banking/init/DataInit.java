@@ -1,7 +1,7 @@
 package com.istad.banking.init;
 
 import com.istad.banking.domain.Roles;
-import com.istad.banking.feature.repository.RoleRepository;
+import com.istad.banking.feature.user.RoleRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

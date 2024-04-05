@@ -2,7 +2,7 @@ package com.istad.banking.mapper;
 
 
 import com.istad.banking.domain.AccountType;
-import com.istad.banking.feature.dto.AccountTypeResponse;
+import com.istad.banking.feature.accountType.dto.AccountTypeResponse;
 import org.mapstruct.Mapper;
 
 import java.util.List;

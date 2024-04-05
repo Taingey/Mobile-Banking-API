@@ -1,10 +1,10 @@
 package com.istad.banking.mapper;
 
 import com.istad.banking.domain.User;
-import com.istad.banking.feature.dto.UserCreateRequest;
-import com.istad.banking.feature.dto.UserProfileUpdateRequest;
-import com.istad.banking.feature.dto.UserResponse;
-import com.istad.banking.feature.dto.UserUpdateRequest;
+import com.istad.banking.feature.user.dto.UserCreateRequest;
+import com.istad.banking.feature.user.dto.UserProfileUpdateRequest;
+import com.istad.banking.feature.user.dto.UserResponse;
+import com.istad.banking.feature.user.dto.UserUpdateRequest;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
