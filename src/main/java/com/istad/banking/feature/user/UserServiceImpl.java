@@ -12,6 +12,7 @@ import com.istad.banking.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
+    @Value("${media.base-uri}")
+    private String mediaBaseUri;
     @Override
     public void createNew(UserCreateRequest userCreateRequest) {
 
@@ -190,6 +193,22 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserFromProfileUpdateRequest(profileUpdateRequest, user);
         user = userRepository.save(user);
         return userMapper.toUserResponse(user);
+    }
+
+
+    @Override
+    public String updateProfileImage(String uuid, String mediaName) {
+
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "User has not been found!"));
+
+        user.setProfileImage(mediaName);
+
+        userRepository.save(user);
+
+        return mediaBaseUri + "IMAGE/" + mediaName;
     }
 
 }

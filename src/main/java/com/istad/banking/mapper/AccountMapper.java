@@ -12,7 +12,10 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        UserMapper.class,
+        AccountTypeMapper.class
+})
 public interface AccountMapper {
 
     Account fromAccountCreateRequest(AccountCreateRequest accountCreateRequest);

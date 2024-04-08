@@ -2,10 +2,8 @@ package com.istad.banking.feature.user;
 
 
 import com.istad.banking.base.BasedMessage;
-import com.istad.banking.feature.user.dto.UserCreateRequest;
-import com.istad.banking.feature.user.dto.UserProfileUpdateRequest;
-import com.istad.banking.feature.user.dto.UserResponse;
-import com.istad.banking.feature.user.dto.UserUpdateRequest;
+import com.istad.banking.base.BasedResponse;
+import com.istad.banking.feature.user.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -69,5 +67,14 @@ public class UserController {
     public UserResponse updateProfile(@PathVariable String uuid,
                               @RequestBody UserProfileUpdateRequest userProfileUpdateRequest){
          return userService.updateProfile(uuid, userProfileUpdateRequest);
+    }
+
+    @PutMapping("/{uuid}/profile-image")
+    BasedResponse<?> updateProfileImage(@PathVariable String uuid,
+                                        @Valid @RequestBody UserProfileImageRequest userProfileImageRequest) {
+        String newProfileImageUri = userService.updateProfileImage(uuid, userProfileImageRequest.mediaName());
+        return BasedResponse.builder()
+                .payload(newProfileImageUri)
+                .build();
     }
 }

@@ -25,4 +25,6 @@ public interface UserService {
     void changePassword(String phoneNumber, String oldPassword, String newPassword, String confirmedPassword);
 
     UserResponse updateProfile(String uuid, UserProfileUpdateRequest request);
+
+    String updateProfileImage(String uuid, String mediaName);
 }
