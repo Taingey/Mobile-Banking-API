@@ -1,7 +1,6 @@
 package com.istad.banking.feature.media;
 
 import com.istad.banking.feature.media.dto.MediaResponse;
-import com.istad.banking.feature.media.service.MediaService;
 import com.istad.banking.util.MediaUtil;
 import lombok.RequiredArgsConstructor;
 

@@ -1,7 +1,6 @@
-package com.istad.banking.feature.media.controller;
+package com.istad.banking.feature.media;
 
 import com.istad.banking.feature.media.dto.MediaResponse;
-import com.istad.banking.feature.media.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

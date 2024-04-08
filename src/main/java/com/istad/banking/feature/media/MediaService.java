@@ -1,4 +1,4 @@
-package com.istad.banking.feature.media.service;
+package com.istad.banking.feature.media;
 
 import com.istad.banking.feature.media.dto.MediaResponse;
 import org.springframework.web.multipart.MultipartFile;
