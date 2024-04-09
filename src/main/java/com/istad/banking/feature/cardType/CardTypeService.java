@@ -9,5 +9,7 @@ public interface CardTypeService {
     List<CardTypeResponse> findAll();
     CardTypeResponse findByName(String name);
     CardType findByCardTypName(String name);
+    void createVisaCard();
+    void createMasterCard();
 
 }

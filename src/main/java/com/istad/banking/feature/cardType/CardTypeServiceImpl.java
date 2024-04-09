@@ -41,4 +41,14 @@ public class CardTypeServiceImpl implements CardTypeService{
         return null;
     }
 
+    @Override
+    public void createVisaCard() {
+
+    }
+
+    @Override
+    public void createMasterCard() {
+
+    }
+
 }

@@ -4,9 +4,11 @@ import com.istad.banking.domain.Account;
 import com.istad.banking.domain.Transactions;
 import com.istad.banking.feature.account.AccountRepository;
 import com.istad.banking.feature.transaction.dto.TransactionCreateRequest;
+import com.istad.banking.feature.transaction.dto.TransactionPaymentRequest;
 import com.istad.banking.feature.transaction.dto.TransactionResponse;
 import com.istad.banking.mapper.TransactionMapper;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
@@ -80,4 +83,34 @@ public class TransactionServiceImpl implements TransactionService{
 
         return transactions.map(transactionMapper::toTransactionResponse);
     }
+
+    @Override
+    public void payment(@Valid TransactionPaymentRequest transactionPaymentRequest) {
+        Account owner = accountRepository.findByAccountNo(transactionPaymentRequest.ownerAccountNo())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Account owner has not been found"
+                        ));
+
+        BigDecimal amount = transactionPaymentRequest.amount();
+
+        if(owner.getBalance().compareTo(amount) < 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Insufficient balance"
+                    );
+        }
+
+        owner.setBalance(owner.getBalance().subtract(amount));
+
+        Transactions transactions = new Transactions();
+        transactions.setOwner(owner);
+        transactions.setAmount(amount);
+        transactions.setRemark("Payment to : " + transactionPaymentRequest.paymentReceiver());
+        transactions.setTransactionType("PAYMENT");
+        transactions.setTransactionAt(LocalDateTime.now());
+        transactions.setStatus(true);
+
+        transactionRepository.save(transactions);
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.istad.banking.feature.transaction;
 
 import com.istad.banking.feature.transaction.dto.TransactionCreateRequest;
+import com.istad.banking.feature.transaction.dto.TransactionPaymentRequest;
 import com.istad.banking.feature.transaction.dto.TransactionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,11 @@ public class TransactionController {
                                                        @RequestParam(defaultValue = "10") int size){
         return transactionService.getTransactionHistorySortedByDate(page, size);
 
+    }
+
+    @PostMapping("/payment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void transactionPayment(@Valid @RequestBody TransactionPaymentRequest transactionCreateRequest){
+         transactionService.payment(transactionCreateRequest);
     }
 }
