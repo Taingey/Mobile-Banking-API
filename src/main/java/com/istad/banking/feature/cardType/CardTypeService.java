@@ -8,4 +8,6 @@ import java.util.List;
 public interface CardTypeService {
     List<CardTypeResponse> findAll();
     CardTypeResponse findByName(String name);
+    CardType findByCardTypName(String name);
+
 }

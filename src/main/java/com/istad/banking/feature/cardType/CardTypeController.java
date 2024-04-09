@@ -1,6 +1,5 @@
 package com.istad.banking.feature.cardType;
 
-import com.istad.banking.domain.CardType;
 import com.istad.banking.feature.cardType.dto.CardTypeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ public class CardTypeController {
     public List<CardTypeResponse> findCardAll(){
         return cardTypeService.findAll();
     }
-
     @GetMapping("/{name}")
     public CardTypeResponse findByName(@PathVariable String name){
         return cardTypeService.findByName(name);

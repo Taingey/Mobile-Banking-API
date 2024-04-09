@@ -35,4 +35,10 @@ public class CardTypeServiceImpl implements CardTypeService{
                 ));
         return cardTypeMapper.toCardTypeResponse(cardType);
     }
+
+    @Override
+    public CardType findByCardTypName(String name) {
+        return null;
+    }
+
 }

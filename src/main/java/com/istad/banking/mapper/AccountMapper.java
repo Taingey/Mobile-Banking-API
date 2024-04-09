@@ -5,6 +5,7 @@ import com.istad.banking.domain.User;
 import com.istad.banking.domain.UsersAccounts;
 import com.istad.banking.feature.account.dto.AccountCreateRequest;
 import com.istad.banking.feature.account.dto.AccountResponse;
+import com.istad.banking.feature.account.dto.AccountSnippetResponse;
 import com.istad.banking.feature.user.dto.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,4 +29,6 @@ public interface AccountMapper {
         return toUserResponse(userAccountList.get(0).getUser());
     }
     UserResponse toUserResponse(User user);
+
+    AccountSnippetResponse toAccountSnippetResponse(Account account);
 }
