@@ -31,7 +31,7 @@ public class TransactionController {
 
     @PostMapping("/payment")
     @ResponseStatus(HttpStatus.CREATED)
-    public void transactionPayment(@Valid @RequestBody TransactionPaymentRequest transactionCreateRequest){
-         transactionService.payment(transactionCreateRequest);
+    public void transactionPayment(@Valid @RequestBody TransactionPaymentRequest transactionCreateRequest) {
+        transactionService.payment(transactionCreateRequest);
     }
 }

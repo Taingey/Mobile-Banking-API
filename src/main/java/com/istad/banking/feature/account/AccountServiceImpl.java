@@ -11,7 +11,6 @@ import com.istad.banking.feature.account.dto.AccountResponse;
 import com.istad.banking.feature.accountType.AccountTypeRepository;
 import com.istad.banking.feature.accountType.dto.AccountTypeResponse;
 import com.istad.banking.feature.user.UserRepository;
-
 import com.istad.banking.feature.user.dto.UserResponse;
 import com.istad.banking.mapper.AccountMapper;
 import com.istad.banking.mapper.AccountTypeMapper;
@@ -42,7 +41,6 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public void createNew(AccountCreateRequest accountCreateRequest) {
-
         AccountType accountType = accountTypeRepository.findByAlias(accountCreateRequest.accountTypeAlias())
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -60,7 +58,6 @@ public class AccountServiceImpl implements AccountService{
         account.setTransferLimit(BigDecimal.valueOf(5000));
         account.setIsHidden(false);
 
-        // Save the account first
         Account savedAccount = accountRepository.save(account);
 
         UsersAccounts userAccount = new UsersAccounts();

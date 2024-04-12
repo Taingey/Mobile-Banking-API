@@ -100,7 +100,6 @@ public class TransactionServiceImpl implements TransactionService{
         }
 
         owner.setBalance(owner.getBalance().subtract(amount));
-
         Transactions transactions = new Transactions();
         transactions.setOwner(owner);
         transactions.setAmount(amount);
@@ -111,6 +110,4 @@ public class TransactionServiceImpl implements TransactionService{
 
         transactionRepository.save(transactions);
     }
-
-
 }
