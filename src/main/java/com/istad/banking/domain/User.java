@@ -80,12 +80,16 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<UsersAccounts> userAccountList;
 
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Roles> roles;
 
+    private Boolean isAccountNonExpired;
+    private Boolean isAccountNonLocked;
+    private Boolean isCredentialsNonExpired;
     private Boolean isDeleted;
     private Boolean isBlocked;
 

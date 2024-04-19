@@ -72,6 +72,9 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(LocalDateTime.now());
         user.setIsBlocked(false);
         user.setIsDeleted(false);
+        user.setIsAccountNonLocked(true);
+        user.setIsAccountNonExpired(true);
+        user.setIsCredentialsNonExpired(true);
 
         List<Roles> roles = new ArrayList<>();
         Roles userRole = roleRepository.findByName("USER")

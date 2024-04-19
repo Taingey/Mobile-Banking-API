@@ -18,17 +18,13 @@ import java.util.List;
         AccountTypeMapper.class
 })
 public interface AccountMapper {
-
     Account fromAccountCreateRequest(AccountCreateRequest accountCreateRequest);
-
     @Mapping(source = "usersAccounts", target = "user", qualifiedByName = "mapUserResponse")
     AccountResponse toAccountResponse(Account account);
-
     @Named("mapUserResponse")
     default UserResponse mapUserResponse(List<UsersAccounts> userAccountList){
         return toUserResponse(userAccountList.get(0).getUser());
     }
     UserResponse toUserResponse(User user);
-
     AccountSnippetResponse toAccountSnippetResponse(Account account);
 }
