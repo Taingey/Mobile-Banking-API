@@ -34,7 +34,5 @@ public class DataInit {
                     List.of(user, customer, staff, admin)
             );
         }
-
     }
-
 }
