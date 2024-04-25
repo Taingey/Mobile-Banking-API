@@ -3,51 +3,47 @@ package com.istad.banking.feature.auth;
 
 import com.istad.banking.feature.auth.dto.AuthResponse;
 import com.istad.banking.feature.auth.dto.LoginRequest;
-import com.istad.banking.security.CustomUserDetails;
+import com.istad.banking.feature.auth.dto.RefreshTokenRequest;
+import com.istad.banking.feature.token.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService{
     private final DaoAuthenticationProvider daoAuthenticationProvider;
-    private final JwtEncoder jwtEncoder;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final TokenService tokenService;
+
     @Override
-    public AuthResponse authorities(LoginRequest loginRequest){
-        Authentication authorities = new UsernamePasswordAuthenticationToken(
-                loginRequest.password(),
-                loginRequest.phoneNumber()
+    public AuthResponse refresh(RefreshTokenRequest refreshTokenRequest) {
+
+        Authentication auth = new BearerTokenAuthenticationToken(
+                refreshTokenRequest.refreshToken()
         );
 
-        authorities = daoAuthenticationProvider.authenticate(authorities);
-        CustomUserDetails userDetails = (CustomUserDetails) authorities.getDetails();
-        log.info(userDetails.getUsername());
-        log.info(userDetails.getPassword());
-        userDetails.getAuthorities()
-                .forEach(grantedAuthority -> System.out.println(grantedAuthority.getAuthority()));
-        Instant now = Instant.now();
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
-                .id(userDetails.getUsername())
-                .subject("Access Resource")
-                .audience(List.of("WEB", "MOBILE"))
-                .issuedAt(now)
-                .expiresAt(now.plus(5, ChronoUnit.MINUTES))
-                .issuer(userDetails.getUsername())
-                .build();
-        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
+        auth = jwtAuthenticationProvider.authenticate(auth);
 
-        return new AuthResponse("Bearer", accessToken, "");
+        return tokenService.createToken(auth);
     }
+
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) {
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                loginRequest.phoneNumber(),
+                loginRequest.password()
+        );
+
+        auth = daoAuthenticationProvider.authenticate(auth);
+
+        return tokenService.createToken(auth);
+    }
+
 }

@@ -1,13 +1,16 @@
 package com.istad.banking.security;
 
+import com.istad.banking.util.KeyUtil;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -20,13 +23,10 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 @Configuration
@@ -37,105 +37,105 @@ import java.util.UUID;
 public class SecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
-
     private final UserDetailsService userDetailsService;
+    private final KeyUtil keyUtil;
+
+
     @Bean
-    InMemoryUserDetailsManager inMemoryUserDetailsManager(){
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-
-        UserDetails userAdmin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin"))
-                .roles("USER", "ADMIN")
-                .build();
-
-        UserDetails userEditor = User.builder()
-                .username("editor")
-                .password(passwordEncoder.encode("editor"))
-                .roles("USER", "EDITOR")
-                .build();
-
-        UserDetails userStaff = User.builder()
-                .username("staff")
-                .password(passwordEncoder.encode("staff"))
-                .roles("USER", "STAFF")
-                .build();
-
-        UserDetails userCustomer = User.builder()
-                .username("customer")
-                .password(passwordEncoder.encode("customer"))
-                .roles("USER", "CUSTOMER")
-                .build();
-
-        manager.createUser(userAdmin);
-        manager.createUser(userEditor);
-        manager.createUser(userStaff);
-        manager.createUser(userCustomer);
-        return manager;
+    JwtAuthenticationProvider jwtAuthenticationProvider(@Qualifier("refreshJwtDecoder") JwtDecoder refreshJwtDecoder) {
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider(refreshJwtDecoder);
+        return provider;
     }
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity.authorizeHttpRequests(request -> request
-                .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,"/api/v1/users/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET,"/api/v1/users/**").hasAnyRole("ADMIN", "EDITOR")
-                .anyRequest()
-                .authenticated()
-        );
-//        httpSecurity.httpBasic(Customizer.withDefaults());
+    DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
 
-        httpSecurity.oauth2ResourceServer(jwt -> jwt.jwt(Customizer.withDefaults()));
+        return provider;
+    }
 
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        // TODO: your security logic
+        httpSecurity
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("SCOPE_user:write")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("SCOPE_user:write")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasAuthority("SCOPE_user:read")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/accounts/**").hasAuthority("SCOPE_account:write")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/accounts/**").hasAuthority("SCOPE_account:write")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/accounts/**").hasAuthority("SCOPE_account:write")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/accounts/**").hasAnyAuthority("SCOPE_ROLE_ADMIN", "SCOPE_account:read")
+                        .anyRequest()
+                        .authenticated()
+                );
+
+        // security mechanism
+        //httpSecurity.httpBasic(Customizer.withDefaults());
+        httpSecurity.oauth2ResourceServer(jwt -> jwt
+                .jwt(Customizer.withDefaults()));
+
+        // Disable CSRF
         httpSecurity.csrf(token -> token.disable());
+        // Change to STATELESS
         httpSecurity.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return httpSecurity.build();
     }
 
+    @Primary
     @Bean
-    DaoAuthenticationProvider daoAuthenticationProvider(){
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-
-        return provider;
-    }
-    @Bean
-    KeyPair keyPair(){
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            return keyPairGenerator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Bean
-    RSAKey rsaKey(KeyPair keyPair){
-        return new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
-                .privateKey(keyPair.getPrivate())
+    JWKSource<SecurityContext> jwkSource() {
+        RSAKey rsaKey = new RSAKey.Builder(keyUtil.getAccessTokenPublicKey())
+                .privateKey(keyUtil.getAccessTokenPrivateKey())
                 .keyID(UUID.randomUUID().toString())
                 .build();
-    }
-    @Bean
-    JWKSource<SecurityContext> jwkSource(RSAKey rsaKey){
         JWKSet jwkSet = new JWKSet(rsaKey);
-        return ((jwkSelector, securityContext) -> jwkSelector
-                .select(jwkSet));
+        return (jwkSelector, securityContext) -> jwkSelector
+                .select(jwkSet);
     }
+
+    @Primary
     @Bean
-    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource){
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
         return new NimbusJwtEncoder(jwkSource);
     }
 
+    @Primary
     @Bean
-     JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException{
+    JwtDecoder jwtDecoder() throws JOSEException {
         return NimbusJwtDecoder
-                .withPublicKey(rsaKey.toRSAPublicKey())
+                .withPublicKey(keyUtil.getAccessTokenPublicKey())
                 .build();
     }
+    @Bean("refreshJwkSource")
+    JWKSource<SecurityContext> refreshJwkSource() {
+        RSAKey rsaKey = new RSAKey.Builder(keyUtil.getRefreshTokenPublicKey())
+                .privateKey(keyUtil.getRefreshTokenPrivateKey())
+                .keyID(UUID.randomUUID().toString())
+                .build();
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, securityContext) -> jwkSelector
+                .select(jwkSet);
+    }
+
+    @Bean("refreshJwtEncoder")
+    JwtEncoder refreshJwtEncoder(@Qualifier("refreshJwkSource") JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
+    @Bean("refreshJwtDecoder")
+    JwtDecoder refreshJwtDecoder() throws JOSEException {
+        return NimbusJwtDecoder
+                .withPublicKey(keyUtil.getRefreshTokenPublicKey())
+                .build();
+    }
+
 
 }
