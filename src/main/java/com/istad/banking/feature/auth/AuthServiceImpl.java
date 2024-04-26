@@ -46,9 +46,11 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public void changePassword(Jwt jwt, ChangePasswordRequest changePasswordRequest) {
+        log.info(jwt.getId());
         User user = userRepository.findByPhoneNumber(jwt.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "User has not been found"));
+
         if(!changePasswordRequest.password().equals(changePasswordRequest.confirmedPassword())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "password does not match");
