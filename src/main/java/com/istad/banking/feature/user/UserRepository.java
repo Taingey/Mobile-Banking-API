@@ -17,8 +17,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByStudentIdCard(String studentIdCard);
 
-    //Optional<User> findByUuid(String uuid);
-
     //@Query(value = "SELECT * FROM users WHERE uuid = ?1", nativeQuery = true)
     @Query("SELECT u FROM User AS u WHERE u.uuid = :uuid")
     Optional<User> findByUuid(String uuid);
@@ -30,6 +28,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     void blockByUuid(String uuid);
 
     Optional<User> findByPhoneNumber(String phoneNumber);
-
-
 }

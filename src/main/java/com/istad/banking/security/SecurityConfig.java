@@ -43,8 +43,7 @@ public class SecurityConfig {
 
     @Bean
     JwtAuthenticationProvider jwtAuthenticationProvider(@Qualifier("refreshJwtDecoder") JwtDecoder refreshJwtDecoder) {
-        JwtAuthenticationProvider provider = new JwtAuthenticationProvider(refreshJwtDecoder);
-        return provider;
+        return new JwtAuthenticationProvider(refreshJwtDecoder);
     }
 
     @Bean
@@ -79,10 +78,7 @@ public class SecurityConfig {
         //httpSecurity.httpBasic(Customizer.withDefaults());
         httpSecurity.oauth2ResourceServer(jwt -> jwt
                 .jwt(Customizer.withDefaults()));
-
-        // Disable CSRF
         httpSecurity.csrf(token -> token.disable());
-        // Change to STATELESS
         httpSecurity.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
